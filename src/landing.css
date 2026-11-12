@@ -402,7 +402,7 @@
 .lx-nav-logo { height: 42px; }
 .lx-footer-logo { height: 34px; }
 .brand-logo.is-animated .brand-arc { transform-origin: 54px 62px; animation: arc-draw 1.1s cubic-bezier(.2,.8,.2,1) .2s both, arc-float 6s ease-in-out 1.4s infinite; }
-.brand-logo.is-animated text { animation: logo-in .7s cubic-bezier(.2,.8,.2,1) both; }
+.brand-logo.is-animated .brand-word { animation: logo-in .7s cubic-bezier(.2,.8,.2,1) both; }
 .brand-logo.is-animated .brand-shine { animation: shine 4.5s ease-in-out 1.6s infinite; }
 @keyframes arc-draw { from { clip-path: inset(0 100% 0 0); opacity: .2; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
 @keyframes arc-float { 50% { transform: translateY(-2px) rotate(-1deg); } }
