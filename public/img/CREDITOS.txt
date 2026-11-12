@@ -1,0 +1,17 @@
+Fotos:
+- abogada-recorte.webp: Pexels 34381970 (fondo eliminado localmente con BiRefNet)
+- madre-hija.jpg: Pexels 16838203, Israel Torres
+- vendedora-mercado.jpg: Pexels 16817337
+- teguc-skyline.jpg: Wikimedia Commons "Tegucigalpa-skyline-2024.jpg", CC0
+Retratos l-*.jpg: recortados de las maquetas del cliente y de la foto 34381970 (provisionales).
+Logos de instituciones: ver public/aliados/LEEME.txt
+Carrusel de temas (img/temas):
+- familia.jpg: Pexels 16838203, Israel Torres
+- laboral.jpg: Pexels 35390341
+- penal.jpg: Pexels 8209908
+- terrenos.jpg: Pexels 33533970
+- empresarial.jpg: Pexels 16817337
+- campesino.jpg: Pexels 16957832
+- tranquilidad/comerciantes.jpg: Pexels 37330783
+- tranquilidad/familias.jpg: Pexels 13197862, Catalina Herrera
+- tranquilidad/trabajadores.jpg: Pexels 16957832

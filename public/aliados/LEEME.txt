@@ -1,0 +1,12 @@
+Logos oficiales en versión blanca, descargados de los sitios de cada institución (nov 2026):
+- cah.png: colegiodeabogados.hn (confirmar que es el sitio oficial del CAH)
+- ccit.png: ccit.hn (recortado de un banner oficial)
+- ccic.png: ccichonduras.org
+- cohep.png: cohep.org
+- ahm.png: ahm-honduras.com
+- uth.png: uth.hn
+- consortium.png: consortiumlegal.com
+- arias.png: ariaslaw.com
+- garciabodan.png: garciabodan.com
+Mostrar logos de terceros en público requiere autorización de cada institución.
+- unah.png: Wikimedia Commons "Escudo de la UNAH.svg", CC BY-SA 3.0 (versión en blanco)
