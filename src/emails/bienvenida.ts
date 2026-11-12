@@ -76,7 +76,7 @@ export function renderWelcomeEmail(d: WelcomeData): string {
       <p style="margin:18px 0 0;font:500 13px/1.5 Arial,Helvetica,sans-serif;color:#5a6680">Comparta Next Legal con quien lo necesite: el derecho le pertenece a todas las personas.</p>
     </td></tr>
     <tr><td style="background:#f2f4f8;padding:22px 36px" align="center">
-      <p style="margin:0 0 6px;font:700 12px/1.5 Arial,Helvetica,sans-serif;color:#0e1f47">Next Legal · Hecho en Honduras</p>
+      <p style="margin:0 0 6px;font:700 12px/1.5 Arial,Helvetica,sans-serif;color:#0e1f47">Next Legal</p>
       <p style="margin:0;font:500 11px/1.5 Arial,Helvetica,sans-serif;color:#8a93a8">Recibe este correo porque se registró en la lista de espera de Next Legal.<br>Si no fue usted, ignore este mensaje o <a href="#" style="color:#5a6680">cancele su suscripción</a>.</p>
     </td></tr>
   </table>

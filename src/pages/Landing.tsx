@@ -164,10 +164,10 @@ function AboutSection() {
       <div className="lx-wrap">
         <div className="lx-about-grid">
           <div className="lx-about-copy" data-reveal>
-            <p className="lx-kicker"><Sparkle weight="fill" size={18} /> Quiénes somos · Hecho en Honduras</p>
+            <p className="lx-kicker"><Sparkle weight="fill" size={18} /> Quiénes somos</p>
             <h2>El derecho le pertenece a todas las personas</h2>
             <p className="lx-about-lead">Next Legal es una red abierta que acerca a cada persona a un abogado de trayectoria, sin distancias ni intermediarios, con procesos claros que se pueden seguir paso a paso.</p>
-            <p className="lx-about-lead">Nacimos en Honduras con una convicción: el acceso a la justicia no debe tener fronteras.</p>
+            <p className="lx-about-lead">Nacimos con una convicción: el acceso a la justicia no debe tener fronteras.</p>
           </div>
           <div className="lx-about-visual" data-reveal><NetworkMap /></div>
         </div>
@@ -363,7 +363,7 @@ function ProCard({ l, i }: { l: Lawyer; i: number }) {
           <small>por consulta de 1 hora</small>
         </div>
         <dl className="lx-pro-stats">
-          <div><dt>Años de experiencia</dt><dd>{l.years}</dd></div>
+          <div><dt>Experiencia</dt><dd>{l.years} años</dd></div>
           <div><dt>Casos resueltos</dt><dd>{l.casesSolved}</dd></div>
           <div><dt>Calificación</dt><dd><Star weight="fill" size={20} className="star" /> {l.rating.toFixed(1)}</dd></div>
         </dl>
@@ -482,7 +482,7 @@ export default function Landing() {
         <LiveLines />
         <div className="lx-hero-grid">
           <div className="lx-hero-copy" data-reveal>
-            <p className="lx-kicker"><Sparkle weight="fill" size={18} /> Tecnología legal hecha en Honduras</p>
+            <p className="lx-kicker"><Sparkle weight="fill" size={18} /> Abogados verificados, en línea y en persona</p>
             <h1>El abogado que usted necesita, a un toque de distancia.</h1>
             <p className="lx-lead">Abogados de trayectoria, precios claros desde el inicio y su caso siempre a la vista. Desde su celular, esté donde esté.</p>
             <div className="lx-ctas">
@@ -499,8 +499,8 @@ export default function Landing() {
       </section>
 
       {/* Instituciones en bucle */}
-      <section className="lx-allies" aria-label="Instituciones del sistema legal y empresarial de Honduras">
-        <p>Instituciones del sistema legal y empresarial de Honduras</p>
+      <section className="lx-allies" aria-label="Instituciones del sistema legal y empresarial">
+        <p>Instituciones del sistema legal y empresarial</p>
         <div className="lx-marquee">
           <div className="lx-marquee-track">
             {[...allies, ...allies].map((a, i) => (
@@ -561,12 +561,12 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 5. Para toda Honduras: mapa vivo */}
+      {/* 5. En todo el país: mapa vivo */}
       <section className="lx-country">
         <LiveLines />
         <div className="lx-wrap lx-country-grid">
           <div className="lx-country-copy" data-reveal>
-            <h2>Para toda Honduras</h2>
+            <h2>En todo el país</h2>
             <p>Desde cualquier departamento puede hablar con su abogado por videollamada. Y si prefiere verlo en persona, le esperamos en Tegucigalpa o en San Pedro Sula.</p>
             <dl className="lx-country-stats">
               <div><dt>Departamentos con atención en línea</dt><dd>18</dd></div>

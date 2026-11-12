@@ -1126,3 +1126,13 @@ html { scroll-padding-top: 84px; }
 .ln-apple { background: #000 !important; color: #fff !important; border: 2px solid #000 !important; }
 .ln-apple:hover { background: #1a1a1a !important; }
 @media (prefers-reduced-motion: reduce) { .ln-orbit, .ln-glow { animation: none; } }
+
+/* ===== v13: arreglos de celular ===== */
+.lx-allies > p { padding: 0 16px; }
+@media (max-width: 1080px) {
+  .lx-join { padding-top: 72px; }
+}
+@media (max-width: 720px) {
+  .lx-join { padding-top: 56px; }
+  .lx-picks > div { max-height: none; overflow: visible; }
+}
