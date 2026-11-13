@@ -34,7 +34,6 @@ npm run deploy     # compila con base /next-legal/ y publica en la rama gh-pages
 - Fecha de lanzamiento y lista de espera: `src/lib/launch.ts` (`LAUNCH_DATE`, `WAITLIST_BASE`).
 - Tras cambiar la fecha, regenerar la cuenta regresiva del correo: `npm run email:gif`.
 - Videos del logo en bucle para pantallas, en horizontal (1920×1080) y vertical (1080×1920): `npm run marca:videos` los deja en `marca/08-videos/`.
-- Video del stand (lema, cuenta regresiva y QR a la web): `node scripts/logo-loops.mjs estreno --todos` genera uno por día hasta la víspera del estreno. Si cambia la fecha de lanzamiento o la dirección de la web, hay que volver a generarlos.
 - Los registros del kiosko se guardan solo en el dispositivo; se exportan desde `/kiosko/registros`.
 
 ## Stack
