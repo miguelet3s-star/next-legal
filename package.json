@@ -11,6 +11,7 @@
     "test": "vitest run",
     "email:gif": "node scripts/countdown-gif.mjs public/email/countdown.gif",
     "marca:videos": "node scripts/logo-loops.mjs",
+    "stand:videos": "node scripts/stand/grabar.mjs",
     "deploy": "bash scripts/deploy.sh"
   },
   "dependencies": {
@@ -27,6 +28,8 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "oxlint": "^1.90.0",
+    "puppeteer-core": "^25.17.0",
+    "qrcode": "^1.5.4",
     "sharp": "^0.34.4",
     "typescript": "~7.0.2",
     "vite": "^8.3.6",

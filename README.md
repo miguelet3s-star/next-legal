@@ -34,6 +34,7 @@ npm run deploy     # compila con base /next-legal/ y publica en la rama gh-pages
 - Fecha de lanzamiento y lista de espera: `src/lib/launch.ts` (`LAUNCH_DATE`, `WAITLIST_BASE`).
 - Tras cambiar la fecha, regenerar la cuenta regresiva del correo: `npm run email:gif`.
 - Videos del logo en bucle para pantallas, en horizontal (1920×1080) y vertical (1080×1920): `npm run marca:videos` los deja en `marca/08-videos/`.
+- Videos del stand (la app real manejándose sola, con «Muy pronto» y QR): `npm run stand:videos` graba los seis en `marca/08-videos/stand/` (tarda unos 10 minutos y necesita Google Chrome). La dirección del QR está en `scripts/stand/escena.js` (`WEB`); si cambia, hay que volver a grabar.
 - Los registros del kiosko se guardan solo en el dispositivo; se exportan desde `/kiosko/registros`.
 
 ## Stack
