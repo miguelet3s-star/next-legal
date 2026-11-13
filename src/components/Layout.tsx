@@ -175,14 +175,15 @@ function ShellBody({ me, role }: { me: Session; role: Role }) {
 
       <div className="main">
         <header className="topbar">
-          {role === 'cliente' ? (
+          {/* En el inicio del cliente la búsqueda ya está en el saludo: no se repite arriba. */}
+          {role === 'abogado' ? (
+            <p className="topbar-date">{formatLong(today())}</p>
+          ) : pathname === '/inicio' ? null : (
             <form className="search" onSubmit={onSearch} role="search">
               <MagnifyingGlass size={18} className="muted" />
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Escriba su problema: despido, pensión, terreno…" aria-label="Buscar abogado" />
               <button className="search-btn" aria-label="Buscar"><MagnifyingGlass size={18} weight="bold" /></button>
             </form>
-          ) : (
-            <p className="topbar-date">{formatLong(today())}</p>
           )}
           <span className="topbar-end">
             <Notices me={me} />
