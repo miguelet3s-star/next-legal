@@ -1,26 +1,32 @@
-import { Barricade } from '@phosphor-icons/react'
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import Layout from './components/Layout'
-import { EmptyState } from './components/ui'
+import Chat from './components/Chat'
+import { ClientLayout, LawyerLayout } from './components/Layout'
+import { signOut } from './lib/session'
 import Booking from './pages/Booking'
 import { CaseDetail, CaseList } from './pages/Cases'
-import Home from './pages/Home'
-import LawyerProfile from './pages/LawyerProfile'
+import Consultas from './pages/Consultas'
 import CorreoPreview from './pages/CorreoPreview'
+import Documentos from './pages/Documentos'
+import Home from './pages/Home'
 import KioskLeads from './pages/KioskLeads'
 import Landing from './pages/Landing'
+import LawyerProfile from './pages/LawyerProfile'
 import Login from './pages/Login'
+import Pagos from './pages/Pagos'
+import Perfil from './pages/Perfil'
 import Search from './pages/Search'
-
-function Soon({ title }: { title: string }) {
-  return <EmptyState icon={Barricade} title={title} text="Pantalla en construcción para la siguiente iteración." />
-}
+import Agenda from './pages/despacho/Agenda'
+import { DeskCaseDetail, DeskCaseList } from './pages/despacho/Casos'
+import Clientes from './pages/despacho/Clientes'
+import Hoy from './pages/despacho/Hoy'
+import Ingresos from './pages/despacho/Ingresos'
+import DeskPerfil from './pages/despacho/Perfil'
 
 const KIOSK_KEY = 'nextlegal.kiosk'
 const IDLE_MS = 90_000
 
-/** Modo kiosko (?kiosko=1): tras 90 s sin tocar la pantalla vuelve a la portada. */
+/** Modo kiosko (?kiosko=1): tras 90 s sin tocar la pantalla cierra la sesión y vuelve a la portada. */
 function KioskIdle() {
   const { pathname, search } = useLocation()
   const navigate = useNavigate()
@@ -41,6 +47,7 @@ function KioskIdle() {
     const reset = () => {
       clearTimeout(t)
       t = window.setTimeout(() => {
+        signOut()
         if (pathname !== '/') navigate('/')
         else window.scrollTo({ top: 0, behavior: 'smooth' })
       }, IDLE_MS)
@@ -62,20 +69,36 @@ export default function App() {
         <Route path="/entrar" element={<Login />} />
         <Route path="/kiosko/registros" element={<KioskLeads />} />
         <Route path="/correo" element={<CorreoPreview />} />
-        <Route element={<Layout />}>
+
+        {/* Área del cliente */}
+        <Route element={<ClientLayout />}>
           <Route path="/inicio" element={<Home />} />
           <Route path="/buscar" element={<Search />} />
           <Route path="/abogado/:id" element={<LawyerProfile />} />
           <Route path="/agendar/:id" element={<Booking />} />
           <Route path="/casos" element={<CaseList />} />
           <Route path="/casos/:id" element={<CaseDetail />} />
-          <Route path="/consultas" element={<Soon title="Consultas" />} />
-          <Route path="/documentos" element={<Soon title="Documentos" />} />
-          <Route path="/pagos" element={<Soon title="Pagos" />} />
-          <Route path="/mensajes" element={<Soon title="Mensajes" />} />
-          <Route path="/configuracion" element={<Soon title="Configuración" />} />
-          <Route path="/perfil" element={<Soon title="Perfil" />} />
+          <Route path="/consultas" element={<Consultas />} />
+          <Route path="/documentos" element={<Documentos />} />
+          <Route path="/pagos" element={<Pagos />} />
+          <Route path="/mensajes" element={<Chat />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/configuracion" element={<Navigate to="/perfil" replace />} />
         </Route>
+
+        {/* Área del abogado: el despacho */}
+        <Route path="/despacho" element={<LawyerLayout />}>
+          <Route index element={<Hoy />} />
+          <Route path="agenda" element={<Agenda />} />
+          <Route path="casos" element={<DeskCaseList />} />
+          <Route path="casos/:id" element={<DeskCaseDetail />} />
+          <Route path="clientes" element={<Clientes />} />
+          <Route path="mensajes" element={<Chat />} />
+          <Route path="ingresos" element={<Ingresos />} />
+          <Route path="perfil" element={<DeskPerfil />} />
+          <Route path="*" element={<Navigate to="/despacho" replace />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

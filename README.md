@@ -9,6 +9,14 @@ Prototipo navegable de la página de lanzamiento y de la app de Next Legal.
 - **Vista previa del correo de bienvenida:** https://miguelet3s-star.github.io/next-legal/correo
 - **Versión “ya lanzada”** (el botón pasa a *Iniciar sesión*): agregue `?lanzado=1` a la dirección.
 
+## Las dos áreas de la app
+Al iniciar sesión se elige el tipo de cuenta y cada una abre su propia área. No se cruzan: quien entra a una ruta de la otra área vuelve a su inicio, y sin sesión se va a `/entrar` (reglas en `src/lib/session.ts`).
+
+- **Cliente** (`/inicio`, `/buscar`, `/abogado/:id`, `/agendar/:id`, `/casos`, `/consultas`, `/documentos`, `/pagos`, `/mensajes`, `/perfil`).
+- **Abogado** (`/despacho`, `/despacho/agenda`, `/despacho/casos`, `/despacho/clientes`, `/despacho/mensajes`, `/despacho/ingresos`, `/despacho/perfil`).
+
+Las dos áreas comparten los mismos datos (`src/lib/db.ts`): lo que el cliente agenda le llega al abogado, y cada avance que el abogado registra aparece en el caso del cliente. Cada pantalla recibe solo las filas de quien tiene la sesión (`scopeDb`). En el prototipo los datos y la sesión viven en el dispositivo; el pago es de muestra y los archivos subidos no se conservan al cerrar.
+
 ## Ejecutar en local
 ```bash
 npm install

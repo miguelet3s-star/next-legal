@@ -123,57 +123,6 @@ export const lawyers: Lawyer[] = [
   },
 ]
 
-export type CaseStatus = 'En progreso' | 'En revisión' | 'Pendiente'
-
-export interface TimelineEvent {
-  date: string
-  title: string
-  detail: string
-  time?: string
-  current?: boolean
-}
-
-export interface LegalCase {
-  id: string
-  title: string
-  status: CaseStatus
-  lawyerId: string
-  timeline: TimelineEvent[]
-}
-
-export const cases: LegalCase[] = [
-  {
-    id: 'LD-2025-0458', title: 'Despido injustificado', status: 'En progreso', lawyerId: 'maria-fernanda-lopez',
-    timeline: [
-      { date: '20 may 2025', title: 'Demanda aceptada', detail: 'El juzgado ha aceptado la demanda y se ha asignado número de caso.', time: '10:30 a.m.', current: true },
-      { date: '15 may 2025', title: 'Audiencia preliminar', detail: 'Se realizó la audiencia preliminar con ambas partes.', time: '11:00 a.m.' },
-      { date: '10 may 2025', title: 'Documentos enviados', detail: 'Se enviaron documentos y evidencias al juzgado.' },
-      { date: '5 may 2025', title: 'Caso creado', detail: 'Hemos creado tu caso y comenzamos a trabajar.' },
-    ],
-  },
-  {
-    id: 'LD-2025-0398', title: 'Divorcio de mutuo acuerdo', status: 'En revisión', lawyerId: 'daniela-funez',
-    timeline: [
-      { date: '2 may 2025', title: 'Documentos en revisión', detail: 'La abogada revisa el convenio de divorcio.', current: true },
-      { date: '28 abr 2025', title: 'Caso creado', detail: 'Hemos creado tu caso y comenzamos a trabajar.' },
-    ],
-  },
-  {
-    id: 'LD-2025-0377', title: 'Cobro de deuda', status: 'Pendiente', lawyerId: 'carlos-mejia',
-    timeline: [{ date: '25 abr 2025', title: 'Caso creado', detail: 'Pendiente de asignar fecha de revisión.', current: true }],
-  },
-]
-
-export const nextConsultation = {
-  date: 'Martes, 27 de mayo de 2025',
-  time: '10:00 a.m.',
-  lawyerId: 'maria-fernanda-lopez',
-}
-
-export const currentUser = { firstName: 'Juan', name: 'Juan Pérez' }
-
-export const PLATFORM_FEE_BPS = 1000 // 10 %
-
 export function getLawyer(id: string): Lawyer | undefined {
   return lawyers.find((l) => l.id === id)
 }

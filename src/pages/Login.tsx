@@ -6,13 +6,14 @@ import { BrandLogo } from '../components/BrandLogo'
 import { LiveLines } from '../components/LiveLines'
 import { AppleMark, GoogleG } from '../components/AuthLogos'
 import { isEmail } from '../lib/leads'
+import type { Role } from '../lib/session'
+import { HOME, signIn } from '../lib/session'
 import '../landing.css'
-
-type Role = 'cliente' | 'abogado'
 
 /**
  * Inicio de sesión de Next Legal (prototipo). La autenticación real se conectará después
- * con un proveedor seguro (por ejemplo, Supabase Auth); aquí solo se valida el formulario.
+ * con un proveedor seguro (por ejemplo, Supabase Auth); aquí se valida el formulario y se
+ * abre el área que corresponde al tipo de cuenta: la del cliente o el despacho del abogado.
  */
 export default function Login() {
   const navigate = useNavigate()
@@ -23,6 +24,8 @@ export default function Login() {
   const [errors, setErrors] = useState<{ email?: string; pass?: string }>({})
   const [loading, setLoading] = useState(false)
 
+  const enter = () => navigate(HOME[signIn(role).role], { replace: true })
+
   const submit = (e: FormEvent) => {
     e.preventDefault()
     const errs: typeof errors = {}
@@ -31,7 +34,7 @@ export default function Login() {
     setErrors(errs)
     if (Object.keys(errs).length) return
     setLoading(true)
-    setTimeout(() => navigate('/inicio'), 900)
+    setTimeout(() => enter(), 900)
   }
 
   return (
@@ -46,7 +49,7 @@ export default function Login() {
         </div>
         <div className="ln-welcome">
           <h1>Qué gusto verle de nuevo</h1>
-          <p>Su caso, sus documentos y su abogado, en un solo lugar.</p>
+          <p>{role === 'abogado' ? 'Su agenda, sus expedientes y sus clientes, en un solo lugar.' : 'Su caso, sus documentos y su abogado, en un solo lugar.'}</p>
         </div>
       </aside>
 
@@ -82,8 +85,8 @@ export default function Login() {
 
           <div className="ln-divider"><span>o continúe con</span></div>
           <div className="ln-social">
-            <button type="button" className="ln-google" onClick={() => navigate('/inicio')}><GoogleG size={20} /> Continuar con Google</button>
-            <button type="button" className="ln-apple" onClick={() => navigate('/inicio')}><AppleMark size={20} /> Continuar con Apple</button>
+            <button type="button" className="ln-google" onClick={enter}><GoogleG size={20} /> Continuar con Google</button>
+            <button type="button" className="ln-apple" onClick={enter}><AppleMark size={20} /> Continuar con Apple</button>
           </div>
 
           <p className="ln-new">¿Aún no tiene cuenta? <Link to="/#unete">Crear cuenta</Link></p>

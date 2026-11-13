@@ -19,3 +19,11 @@ export function bookingTotal(consultation: Cents, feeBps: number) {
   const fee = platformFee(consultation, feeBps)
   return { consultation, fee, total: consultation + fee }
 }
+
+/** "1,200" o "1200.50" → centavos. Devuelve null si no es un importe válido. */
+export function parseLempiras(raw: string): Cents | null {
+  const s = raw.replace(/[L\s,]/g, '')
+  const m = /^(\d{1,7})(?:\.(\d{1,2}))?$/.exec(s)
+  if (!m) return null
+  return Number(m[1]) * 100 + Number((m[2] ?? '').padEnd(2, '0'))
+}

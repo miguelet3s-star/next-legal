@@ -1,117 +1,192 @@
-import { Briefcase, CalendarBlank, CheckCircle, ClipboardText, CreditCard, LockSimple, Plus, UserCircle, VideoCamera } from '@phosphor-icons/react'
+import { Briefcase, CalendarBlank, ClipboardText, CreditCard, LockSimple, UserCircle, VideoCamera } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { PLATFORM_FEE_BPS, getLawyer } from '../data/mock'
-import { EmptyState, categoryName } from '../components/ui'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { getLawyer } from '../data/mock'
+import { Avatar, EmptyState, PageHead, categoryName } from '../components/ui'
+import { newId, useApp } from '../lib/app'
+import type { Mode } from '../lib/db'
+import { PLATFORM_FEE_BPS, bookConsultation, freeSlots, openDays } from '../lib/db'
+import { dayNumber, formatLong, formatTime, monthShort, today, weekday } from '../lib/dates'
+import { effectiveSettings } from '../lib/lawyers'
 import { bookingTotal, formatLempiras } from '../lib/money'
+import { getDb, update } from '../lib/store'
+import { asset } from '../lib/asset'
 
 const steps = [
-  { label: 'Servicio', icon: Briefcase },
+  { label: 'Su caso', icon: Briefcase },
   { label: 'Fecha y hora', icon: CalendarBlank },
   { label: 'Resumen', icon: ClipboardText },
   { label: 'Pago', icon: CreditCard },
 ]
-const slots = ['08:00 a.m.', '10:00 a.m.', '11:30 a.m.', '02:00 p.m.', '04:00 p.m.']
-const days = ['Lun 26 may', 'Mar 27 may', 'Mié 28 may', 'Jue 29 may', 'Vie 30 may']
+const CARD = 'Visa terminada en 4242'
 
 export default function Booking() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  const { me, db } = useApp()
   const lawyer = getLawyer(id)
+  const [params] = useSearchParams()
+  const preDay = params.get('dia'), preSlot = params.get('hora')
   const [step, setStep] = useState(0)
-  const [mode, setMode] = useState<string>('En línea')
-  const [day, setDay] = useState(days[1])
-  const [slot, setSlot] = useState(slots[1])
-  const [card, setCard] = useState('4242')
+  const [mode, setMode] = useState<Mode | null>(null)
+  const [topic, setTopic] = useState('')
+  const [day, setDay] = useState<string | null>(preDay)
+  const [slot, setSlot] = useState<string | null>(preSlot)
+  const [error, setError] = useState('')
   const [paid, setPaid] = useState(false)
+  // Un solo identificador por intento: tocar "Pagar" dos veces no cobra dos veces.
+  const [ids] = useState(() => ({ id: newId(), paymentId: newId() }))
 
-  if (!lawyer) return <EmptyState title="Abogado no encontrado" text="Vuelve a la búsqueda." />
-  const { consultation, fee, total } = bookingTotal(lawyer.consultationPrice, PLATFORM_FEE_BPS)
+  if (!lawyer) return <EmptyState title="No encontramos ese abogado" text="Vuelva a la búsqueda y elija otro."><Link to="/buscar" className="btn btn-primary">Buscar abogado</Link></EmptyState>
+  const s = effectiveSettings(db, lawyer)
+  const ref = today()
+  const days = openDays(s, ref)
+  const theDay = day && days.includes(day) ? day : days[0]
+  // Las horas libres se calculan con la agenda completa del abogado, no solo con las consultas propias.
+  const slots = theDay ? freeSlots(getDb(), lawyer.id, s, theDay) : []
+  const theMode = mode ?? s.modes[0]
+  const theSlot = slot && slots.includes(slot) ? slot : null
+  const morning = slots.filter((x) => x < '12:00'), afternoon = slots.filter((x) => x >= '12:00')
+  const { consultation, fee, total } = bookingTotal(s.price, PLATFORM_FEE_BPS)
 
-  if (paid) {
+  if (!s.acceptsNew || days.length === 0) {
+    return <EmptyState icon={CalendarBlank} title="Agenda llena por ahora" text={`${lawyer.name} no tiene horas disponibles. Puede elegir otro abogado del mismo tema.`}><Link to={`/buscar?cat=${lawyer.category}`} className="btn btn-primary">Ver otros abogados</Link></EmptyState>
+  }
+
+  const pay = () => {
+    if (!theSlot) return
+    try {
+      update((d) => bookConsultation(d, { ...ids, clientId: me.userId, lawyerId: lawyer.id, date: theDay, time: theSlot, mode: theMode, topic, price: s.price, method: CARD, today: ref }))
+      setPaid(true)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo agendar. Intente de nuevo.')
+      setSlot(null)
+      setStep(1)
+    }
+  }
+
+  if (paid && slot) {
     return (
-      <div className="page narrow center">
-        <CheckCircle size={64} className="success" />
-        <h1>¡Consulta agendada!</h1>
-        <p className="muted">{day} · {slot} con {lawyer.name}. Pago simulado: no se cobró nada.</p>
-        <button className="btn btn-primary" onClick={() => navigate('/inicio')}>Volver al inicio</button>
+      <div className="page narrow center done">
+        <img src={asset('/img/sello.svg')} alt="" className="seal-stamp" />
+        <h1>Consulta agendada</h1>
+        <p className="muted">El {formatLong(theDay)} a las {formatTime(slot)} con {lawyer.name}. Le avisaremos cuando confirme.</p>
+        <div className="done-actions">
+          <button className="btn btn-primary" onClick={() => navigate('/consultas')}>Ver mis consultas</button>
+          <button className="btn btn-outline" onClick={() => navigate(`/mensajes?con=${lawyer.id}`)}>Escribirle a {lawyer.name.split(' ')[0]}</button>
+        </div>
       </div>
     )
   }
 
+  const canGo = (i: number) => i <= step || i === 1 || !!theSlot
+
   return (
-    <div className="page narrow">
-      <h1 className="page-title">Agendar consulta</h1>
+    <div className="page booking">
+      <div className="booking-main">
+      <PageHead title="Agendar consulta" sub={`Con ${lawyer.name}, ${categoryName(lawyer.category)}`} />
       <ol className="stepper">
-        {steps.map((s, i) => (
-          <li key={s.label} className={i <= step ? 'done' : ''}>
-            <button onClick={() => setStep(i)} aria-label={s.label}>{i === step ? i + 1 : <s.icon size={16} />}</button>
-            <small>{s.label}</small>
+        {steps.map((st, i) => (
+          <li key={st.label} className={i <= step ? 'done' : ''} aria-current={i === step ? 'step' : undefined}>
+            <button onClick={() => canGo(i) && setStep(i)} disabled={!canGo(i)} aria-label={`Paso ${i + 1}: ${st.label}`}>{i === step ? i + 1 : <st.icon size={16} weight="fill" />}</button>
+            <small>{st.label}</small>
           </li>
         ))}
       </ol>
 
       {step === 0 && (
         <section className="panel">
-          <h2>Modalidad</h2>
+          <h2>¿Cómo prefiere la consulta?</h2>
           <div className="option-list">
-            {lawyer.modes.map((m) => (
-              <label key={m} className={`option ${mode === m ? 'selected' : ''}`}>
-                <input type="radio" name="mode" checked={mode === m} onChange={() => setMode(m)} /> {m}
+            {s.modes.map((m) => (
+              <label key={m} className={`option ${theMode === m ? 'selected' : ''}`}>
+                <input type="radio" name="mode" checked={theMode === m} onChange={() => setMode(m)} />
+                <span><b>{m}</b><small className="muted">{m === 'En línea' ? 'Por videollamada, desde su celular' : `En la oficina del abogado, en ${lawyer.city}`}</small></span>
               </label>
             ))}
           </div>
+          <label className="form-field">
+            <span>Cuente su caso en pocas palabras</span>
+            <textarea className="field" rows={3} maxLength={400} value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Por ejemplo: me despidieron hace un mes y no me han pagado." />
+            <small className="muted">Así su abogado llega preparado a la consulta.</small>
+          </label>
           <button className="btn btn-primary btn-block" onClick={() => setStep(1)}>Continuar</button>
         </section>
       )}
 
       {step === 1 && (
         <section className="panel">
-          <h2>Elige día</h2>
-          <div className="pill-row">{days.map((d) => <button key={d} className={`pill ${d === day ? 'active' : ''}`} onClick={() => setDay(d)}>{d}</button>)}</div>
-          <h2>Elige hora</h2>
-          <div className="pill-row">{slots.map((s) => <button key={s} className={`pill ${s === slot ? 'active' : ''}`} onClick={() => setSlot(s)}>{s}</button>)}</div>
-          <button className="btn btn-primary btn-block" onClick={() => setStep(2)}>Continuar</button>
+          {error && <p className="notice-box warn" role="alert">{error}</p>}
+          <h2>Elija el día</h2>
+          <div className="pill-row">
+            {days.map((d) => (
+              <button key={d} className={`pill day-pill ${d === theDay ? 'active' : ''}`} aria-pressed={d === theDay} onClick={() => { setDay(d); setSlot(null) }}>
+                <small>{weekday(d).slice(0, 3)}</small><b>{dayNumber(d)}</b><small>{monthShort(d)}</small>
+              </button>
+            ))}
+          </div>
+          <h2>Elija la hora</h2>
+          {slots.length === 0 ? <p className="muted">Ese día ya no tiene horas libres. Elija otro día.</p> : (
+            <>
+              {[['Por la mañana', morning], ['Por la tarde', afternoon]].map(([label, list]) => (list as string[]).length > 0 && (
+                <div key={label as string} className="slot-group">
+                  <small className="muted">{label as string}</small>
+                  <div className="pill-row">{(list as string[]).map((x) => <button key={x} className={`pill ${x === slot ? 'active' : ''}`} aria-pressed={x === slot} onClick={() => { setSlot(x); setError('') }}>{formatTime(x)}</button>)}</div>
+                </div>
+              ))}
+            </>
+          )}
+          <button className="btn btn-primary btn-block" disabled={!theSlot} onClick={() => setStep(2)}>Continuar</button>
         </section>
       )}
 
-      {step >= 2 && (
+      {step >= 2 && theSlot && (
         <>
           <section className="panel">
-            <h2>Resumen de tu consulta</h2>
+            <h2>Resumen de su consulta</h2>
             <dl className="summary">
-              <dt><UserCircle size={16} /> Abogada</dt><dd>{lawyer.name}</dd>
-              <dt><Briefcase size={16} /> Especialidad</dt><dd>{categoryName(lawyer.category)}</dd>
-              <dt><CalendarBlank size={16} /> Fecha y hora</dt><dd>{day} · {slot}</dd>
-              <dt><VideoCamera size={16} /> Modalidad</dt><dd>{mode}</dd>
+              <dt><UserCircle size={18} /> Abogado</dt><dd>{lawyer.name}</dd>
+              <dt><Briefcase size={18} /> Tema</dt><dd>{categoryName(lawyer.category)}</dd>
+              <dt><CalendarBlank size={18} /> Fecha y hora</dt><dd>{formatLong(theDay)}, {formatTime(theSlot)}</dd>
+              <dt><VideoCamera size={18} /> Atención</dt><dd>{theMode}</dd>
             </dl>
           </section>
           <section className="panel">
-            <h2>Resumen de pago</h2>
-            <div className="row"><span>Consulta (60 min)</span><span>{formatLempiras(consultation)}</span></div>
-            <div className="row"><span>Comisión de plataforma</span><span>{formatLempiras(fee)}</span></div>
+            <h2>Lo que va a pagar</h2>
+            <div className="row"><span>Consulta de 60 minutos</span><span>{formatLempiras(consultation)}</span></div>
+            <div className="row"><span>Servicio de Next Legal</span><span>{formatLempiras(fee)}</span></div>
             <div className="row total"><span>Total</span><span>{formatLempiras(total)}</span></div>
+            <p className="muted small">Si la consulta se cancela antes de realizarse, se le devuelve el total.</p>
           </section>
+          {step === 2 && <button className="btn btn-primary btn-block btn-lg" onClick={() => setStep(3)}>Ir a pagar</button>}
           {step === 3 && (
             <section className="panel">
-              <h2>Método de pago</h2>
+              <h2>Forma de pago</h2>
               <div className="option-list">
-                <label className={`option ${card === '4242' ? 'selected' : ''}`}>
-                  <input type="radio" name="card" checked={card === '4242'} onChange={() => setCard('4242')} />
-                  <span className="visa">VISA</span> •••• 4242
-                </label>
-                <label className={`option ${card === 'new' ? 'selected' : ''}`}>
-                  <input type="radio" name="card" checked={card === 'new'} onChange={() => setCard('new')} />
-                  <Plus size={18} /> Agregar nueva tarjeta
+                <label className="option selected">
+                  <input type="radio" name="card" checked readOnly />
+                  <span className="visa">VISA</span> <span>terminada en 4242</span>
                 </label>
               </div>
-              <button className="btn btn-primary btn-block btn-lg" onClick={() => setPaid(true)}>Pagar consulta</button>
-              <p className="muted small center"><LockSimple size={14} /> Pago seguro y encriptado</p>
+              <button className="btn btn-primary btn-block btn-lg" onClick={pay}>Pagar {formatLempiras(total)}</button>
+              <p className="muted small center with-ic"><LockSimple size={14} weight="fill" /> Pago protegido</p>
             </section>
           )}
-          {step === 2 && <button className="btn btn-primary btn-block" onClick={() => setStep(3)}>Ir a pagar</button>}
         </>
       )}
+      </div>
+
+      <aside className="ticket" aria-label="Su consulta">
+        <div className="ticket-head"><Avatar name={lawyer.name} photo={lawyer.photo} size={52} verified /><span><b>{lawyer.name}</b><small>{categoryName(lawyer.category)}</small></span></div>
+        <dl>
+          <dt>Atención</dt><dd>{theMode}</dd>
+          <dt>Día</dt><dd>{step >= 1 || day ? formatLong(theDay) : 'Por elegir'}</dd>
+          <dt>Hora</dt><dd>{theSlot ? formatTime(theSlot) : 'Por elegir'}</dd>
+        </dl>
+        <div className="ticket-cut" aria-hidden="true" />
+        <div className="ticket-total"><span>Total</span><b>{formatLempiras(total)}</b></div>
+        <small>Consulta {formatLempiras(consultation)} + servicio {formatLempiras(fee)}</small>
+      </aside>
     </div>
   )
 }
