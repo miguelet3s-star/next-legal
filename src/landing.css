@@ -1136,3 +1136,23 @@ html { scroll-padding-top: 84px; }
   .lx-join { padding-top: 56px; }
   .lx-picks > div { max-height: none; overflow: visible; }
 }
+
+/* Fotos de rostro en las fichas del equipo legal */
+.lx-pro-photo img.is-face { left: 0; top: 0; bottom: auto; width: 100%; height: 100%; object-fit: cover; transform: none; }
+.lx-pro:hover .lx-pro-photo img.is-face { transform: scale(1.04); }
+
+/* Equipo */
+.lx-team-grid { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+.lx-member { background: #fff; border: 1px solid var(--rule); border-radius: 14px; padding: 24px 20px 26px; text-align: center; }
+.lx-member-photo { width: 112px; height: 112px; border-radius: 50%; object-fit: cover; display: grid; place-items: center; margin: 0 auto 16px; box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--cyan, #17b3d6); }
+.lx-member-initials { background: linear-gradient(135deg, #1e5bff, #0e1f47); color: #fff; font-weight: 800; font-size: 34px; letter-spacing: .02em; }
+.lx-member h3 { font-size: 20px; line-height: 1.15; }
+.lx-member-role { margin: 6px 0 10px; color: #0e7f99; font-weight: 700; font-size: 14px; }
+.lx-member-does { margin: 0; color: #4b5877; font-size: 14.5px; line-height: 1.5; }
+@media (max-width: 980px) { .lx-team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .lx-team-grid { grid-template-columns: 1fr; } }
+
+/* Enlaces del pie */
+.lx-footer-links { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; justify-content: center; }
+.lx-footer-links a { display: inline-flex; align-items: center; gap: 7px; }
+.lx-pro-photo img.is-face { object-position: 55% 22%; }

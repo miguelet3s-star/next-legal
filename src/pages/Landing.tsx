@@ -1,10 +1,11 @@
-import { ArrowRight, House, SignIn, Bank, Briefcase, CalendarCheck, ChartLineUp, ChatCircleText, FolderOpen, CheckCircle, EnvelopeSimple, GlobeHemisphereWest, Scales, Sparkle, UsersThree, VideoCamera, Buildings, FileText, Gavel, HandCoins, HeartBreak, MagnifyingGlass, MapPin, Scroll, SealCheck, Star, UserCheck } from '@phosphor-icons/react'
+import { ArrowRight, House, SignIn, Bank, Briefcase, CalendarCheck, ChartLineUp, ChatCircleText, FolderOpen, CheckCircle, EnvelopeSimple, GlobeHemisphereWest, Scales, Sparkle, UsersThree, VideoCamera, Buildings, FileText, Gavel, HandCoins, HeartBreak, MagnifyingGlass, MapPin, Scroll, SealCheck, Star, UserCheck, InstagramLogo, ClipboardText } from '@phosphor-icons/react'
 import type { Icon as PhIcon } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import type { CategoryId, Lawyer } from '../data/mock'
 import { getLawyer } from '../data/mock'
+import { ENLACES, equipo } from '../data/equipo'
 import { formatLempiras } from '../lib/money'
 import { Avatar, categoryName } from '../components/ui'
 import { BrandLogo } from '../components/BrandLogo'
@@ -26,7 +27,7 @@ function Seal({ stamped }: { stamped: boolean }) {
 }
 
 /* ---------- Expediente de verificación (el momento principal) ---------- */
-const featured = ['andrea-castillo', 'roberto-zelaya', 'valeria-paz', 'daniel-rivera'].map((id) => getLawyer(id)).filter((l): l is Lawyer => !!l)
+const featured = ['andrea-castillo', 'roberto-zelaya', 'valeria-paz', 'daniel-rivera', 'javier-sanchez', 'kenneth-veroy', 'megan-martell'].map((id) => getLawyer(id)).filter((l): l is Lawyer => !!l)
 
 function checksFor(l: Lawyer) {
   return [
@@ -157,6 +158,29 @@ const pillars: { icon: PhIcon; title: string; text: string }[] = [
   { icon: ChartLineUp, title: 'Resultados que se ven', text: 'Cada caso avanza con pasos reales, documentados y a la vista.' },
   { icon: Scales, title: 'El derecho en sus manos', text: 'Información sencilla para decidir con seguridad.' },
 ]
+
+function TeamSection() {
+  return (
+    <section className="lx-section lx-paper lx-team" id="equipo">
+      <div className="lx-wrap">
+        <h2 className="lx-h2" data-reveal>El equipo detrás de Next Legal</h2>
+        <p className="lx-sub" data-reveal>Personas de Honduras que trabajan para que encontrar un abogado deje de ser complicado.</p>
+        <ul className="lx-team-grid">
+          {equipo.map((m, i) => (
+            <li key={m.name} className="lx-member" data-reveal style={{ ['--d' as string]: i % 2 }}>
+              {m.photo
+                ? <img className="lx-member-photo" src={m.photo} alt={m.name} loading="lazy" />
+                : <span className="lx-member-photo lx-member-initials" aria-hidden="true">{m.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}</span>}
+              <h3>{m.name}</h3>
+              <p className="lx-member-role">{m.role}</p>
+              <p className="lx-member-does">{m.does}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
 
 function AboutSection() {
   return (
@@ -337,7 +361,7 @@ const sedes = [
   { city: 'San Pedro Sula', detail: 'Con cita previa' },
 ]
 
-const pros = ['andrea-castillo', 'roberto-zelaya', 'valeria-paz', 'daniel-rivera'].map((id) => getLawyer(id)).filter((l): l is Lawyer => !!l)
+const pros = ['andrea-castillo', 'roberto-zelaya', 'valeria-paz', 'daniel-rivera', 'javier-sanchez', 'kenneth-veroy', 'megan-martell'].map((id) => getLawyer(id)).filter((l): l is Lawyer => !!l)
 const minPrice = Math.min(...pros.map((l) => l.consultationPrice))
 
 /** Abre el registro con el método de contacto elegido. */
@@ -351,7 +375,7 @@ function ProCard({ l, i }: { l: Lawyer; i: number }) {
   return (
     <article className="lx-pro" data-reveal style={{ ['--d' as string]: i % 2 }}>
       <div className="lx-pro-photo">
-        <img src={l.portrait} alt={l.name} loading="lazy" />
+        <img src={l.portrait ?? l.photo} alt={l.name} loading="lazy" className={l.portrait ? undefined : 'is-face'} />
         <span className="lx-pro-badge"><SealCheck weight="fill" size={16} /> Verificado</span>
       </div>
       <div className="lx-pro-body">
@@ -561,6 +585,8 @@ export default function Landing() {
         </div>
       </section>
 
+      <TeamSection />
+
       {/* 5. En todo el país: mapa vivo */}
       <section className="lx-country">
         <LiveLines />
@@ -622,7 +648,11 @@ export default function Landing() {
       <footer className="lx-footer">
         <BrandLogo tone="light" animated={false} className="lx-footer-logo" />
         <p>© {YEAR} Next Legal. Imágenes con fines ilustrativos.</p>
-        <Link to="/entrar">Iniciar sesión</Link>
+        <nav className="lx-footer-links" aria-label="Redes y opinión">
+          <a href={ENLACES.instagram} target="_blank" rel="noopener noreferrer"><InstagramLogo weight="fill" size={18} /> {ENLACES.instagramUsuario}</a>
+          <a href={ENLACES.encuesta} target="_blank" rel="noopener noreferrer"><ClipboardText weight="fill" size={18} /> Danos tu opinión</a>
+          <Link to="/entrar">Iniciar sesión</Link>
+        </nav>
       </footer>
     </div>
   )

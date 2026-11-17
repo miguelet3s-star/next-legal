@@ -121,6 +121,31 @@ export const lawyers: Lawyer[] = [
     bio: 'Acompaña a familias en procesos de divorcio, custodia y pensiones con trato humano.',
     consultationPrice: 95_000,
   },
+  // Equipo fundador de Next Legal (cifras provisionales del prototipo; ajustar cuando haya datos reales).
+  {
+    id: 'javier-sanchez', bar: '10231', photo: asset('/img/equipo/javier-sanchez.jpg'), name: 'Javier Sánchez', category: 'civil', rating: 5, reviews: 4,
+    city: 'San Pedro Sula', online: true, modes: ['En línea', 'Presencial'], years: 2, casesSolved: 18, successRate: 90,
+    specialties: ['Contratos', 'Cobro de deudas', 'Orientación legal'],
+    helps: ['Si necesita revisar un contrato', 'Si le deben dinero', 'Si no sabe por dónde empezar'],
+    bio: 'Orienta en asuntos civiles y contratos con un lenguaje claro y sin vueltas.',
+    consultationPrice: 70_000,
+  },
+  {
+    id: 'kenneth-veroy', bar: '10232', photo: asset('/img/equipo/kenneth-veroy.jpg'), name: 'Kenneth Veroy', category: 'mercantil', rating: 5, reviews: 3,
+    city: 'San Pedro Sula', online: true, modes: ['En línea', 'Presencial'], years: 2, casesSolved: 14, successRate: 90,
+    specialties: ['Constitución de empresas', 'Contratos comerciales', 'Emprendimiento'],
+    helps: ['Si quiere formalizar su negocio', 'Si va a firmar con un proveedor', 'Si está empezando a emprender'],
+    bio: 'Acompaña a emprendedores y negocios en sus primeros trámites y contratos.',
+    consultationPrice: 70_000,
+  },
+  {
+    id: 'megan-martell', bar: '10233', photo: asset('/img/equipo/megan-martell.jpg'), name: 'Megan Martell', category: 'familia', rating: 5, reviews: 3,
+    city: 'San Pedro Sula', online: true, modes: ['En línea', 'Presencial'], years: 2, casesSolved: 12, successRate: 90,
+    specialties: ['Pensión alimenticia', 'Custodia', 'Orientación familiar'],
+    helps: ['Si necesita una pensión alimenticia', 'Si busca la custodia de sus hijos', 'Si quiere entender sus opciones'],
+    bio: 'Acompaña a familias con trato cercano y explica cada paso del proceso.',
+    consultationPrice: 70_000,
+  },
 ]
 
 export function getLawyer(id: string): Lawyer | undefined {
