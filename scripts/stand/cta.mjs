@@ -1,23 +1,24 @@
 // Video de cierre para el monitor: tres QR (web, Instagram, encuesta) como llamada a la acción.
-// Salida: marca/09-stand/monitor-video/next-legal-cta-qr.mp4 (1920×1080, 30 cuadros/s, 12 s, empalma en bucle).
+// Salida: marca/stand/video-cta-qr.mp4 (1920×1080, 30 cuadros/s, 12 s, empalma en bucle).
 // Uso: node scripts/stand/cta.mjs        (antes: node scripts/stand/impresos.mjs para generar los QR)
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import puppeteer from 'puppeteer-core'
+import { tmpdir } from 'node:os'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..')
-const OUT = join(ROOT, 'marca/09-stand/monitor-video')
+const OUT = join(ROOT, 'marca/stand')
 const CHROME = process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-const qr = (n) => readFileSync(join(ROOT, `marca/09-stand/qr/qr-${n}.svg`), 'utf8')
+const qr = (n) => readFileSync(join(ROOT, `marca/stand/qr-${n}.svg`), 'utf8')
 const f = (p) => pathToFileURL(join(ROOT, p)).href
 const DUR = 12, FPS = 30
 
 const html = `<!doctype html><meta charset="utf-8"><style>
-@font-face{font-family:M;font-weight:400;src:url(${f('marca/04-tipografia/manrope-latin-500-normal.woff')})}
-@font-face{font-family:M;font-weight:700;src:url(${f('marca/04-tipografia/manrope-latin-700-normal.woff')})}
-@font-face{font-family:M;font-weight:800;src:url(${f('marca/04-tipografia/manrope-latin-800-normal.woff')})}
+@font-face{font-family:M;font-weight:400;src:url(${f('marca/identidad/manrope-latin-500-normal.woff')})}
+@font-face{font-family:M;font-weight:700;src:url(${f('marca/identidad/manrope-latin-700-normal.woff')})}
+@font-face{font-family:M;font-weight:800;src:url(${f('marca/identidad/manrope-latin-800-normal.woff')})}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:1920px;height:1080px;overflow:hidden;background:#0a1736;font-family:M,sans-serif;color:#fff}
 #l{position:relative;width:1920px;height:1080px;overflow:hidden;background:radial-gradient(ellipse at 60% 40%,#17378c 0%,#0e1f47 55%,#0a1736 100%)}
@@ -31,7 +32,7 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#0a1736;font-fam
 .c b{display:block;margin-top:24px;font-size:38px;font-weight:800}.c i{display:block;margin-top:8px;font-style:normal;font-size:26px;color:#b9c7e8}
 #pie{position:absolute;left:0;right:0;bottom:36px;text-align:center;font-size:26px;color:#9fb2dc;letter-spacing:.14em;font-weight:700}
 </style><div id="l"><div class="o" id="o1" style="width:820px;height:820px;left:-180px;top:-260px;background:#1e5bff;opacity:.7"></div><div class="o" id="o2" style="width:700px;height:700px;right:-160px;bottom:-280px;background:#17b3d6;opacity:.45"></div>
-<img id="logo" src="${f('marca/01-logo/nextlegal-logo-blanco.png')}">
+<img id="logo" src="${f('marca/identidad/nextlegal-logo-blanco.png')}">
 <div id="tit">Escanee y <span>sea parte</span></div><div id="sub">Apunte la cámara de su celular a cada código</div>
 <div class="c"><div class="q">${qr('web')}</div><b>Conozca la web</b><i>Next Legal</i></div>
 <div class="c"><div class="q">${qr('instagram')}</div><b>@nextlegalhn</b><i>Síganos en Instagram</i></div>
@@ -54,15 +55,16 @@ cs.forEach((c,i)=>{c.style.left=(130+i*580)+'px'})
 render(0)
 </script>`
 
-mkdirSync(join(OUT, 'fuente'), { recursive: true })
-const fuente = join(OUT, 'fuente', 'cta-fuente.html')
+const TMP = join(tmpdir(), 'nl-fuente')
+mkdirSync(TMP, { recursive: true })
+const fuente = join(TMP, 'cta-fuente.html')
 writeFileSync(fuente, html)
 const nav = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--allow-file-access-from-files'] })
 const p = await nav.newPage()
 await p.setViewport({ width: 1920, height: 1080 })
 await p.goto(pathToFileURL(fuente).href, { waitUntil: 'networkidle0' })
 await p.evaluate(() => document.fonts.ready)
-const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '17', '-preset', 'medium', '-movflags', '+faststart', join(OUT, 'next-legal-cta-qr.mp4')], { stdio: ['pipe', 'inherit', 'inherit'] })
+const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '17', '-preset', 'medium', '-movflags', '+faststart', join(OUT, 'video-cta-qr.mp4')], { stdio: ['pipe', 'inherit', 'inherit'] })
 for (let i = 0; i < DUR * FPS; i++) {
   await p.evaluate((t) => render(t), i / FPS)
   const png = await p.screenshot({ type: 'png' })
@@ -70,6 +72,5 @@ for (let i = 0; i < DUR * FPS; i++) {
 }
 ff.stdin.end()
 await new Promise((r) => ff.on('close', r))
-await p.screenshot({ path: join(OUT, 'fuente', 'cta-vista-previa.png') }).catch(() => {})
 await nav.close()
 console.log('listo')

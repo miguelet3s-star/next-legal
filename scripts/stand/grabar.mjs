@@ -1,6 +1,6 @@
 // Graba los videos del stand (1920×1080, 30 cuadros/s, MP4 en bucle) a partir de scripts/stand/escena.html.
 // Uso: node scripts/stand/grabar.mjs [escena…] [--prueba] [--foto <segundo>]
-//   sin argumentos → graba las seis en marca/08-videos/stand/
+//   sin argumentos → graba las seis en marca/stand/
 //   --prueba       → corre cada escena a velocidad real sin grabar y dice cuánto dura (para ajustar T)
 //   --foto 9       → guarda solo ese instante como PNG
 // Cómo graba: dentro de la página el reloj corre LENTO veces más despacio (temporizadores, fechas y
@@ -13,7 +13,7 @@ import puppeteer from 'puppeteer-core'
 import { createServer } from 'vite'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..')
-const OUT = join(ROOT, 'marca/08-videos/stand')
+const OUT = join(ROOT, 'marca/stand')
 const CHROME = process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const ESCENAS = ['muy-pronto', 'registro', 'buscar', 'agendar', 'caso', 'despacho']
 const NOMBRE = { 'muy-pronto': '01-muy-pronto', registro: '02-registro', buscar: '03-busque-su-abogado', agendar: '04-agende-su-consulta', caso: '05-siga-su-caso', despacho: '06-despacho-del-abogado' }
@@ -79,7 +79,7 @@ async function grabar(navegador, id) {
   }
 
   mkdirSync(OUT, { recursive: true })
-  const salida = join(OUT, `next-legal-stand-${NOMBRE[id]}.mp4`)
+  const salida = join(OUT, `video-stand-${NOMBRE[id]}.mp4`)
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'png', '-i', '-',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.2',
     '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-movflags', '+faststart', salida], { stdio: ['pipe', 'inherit', 'inherit'] })

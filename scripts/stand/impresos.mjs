@@ -1,16 +1,19 @@
 // Genera los QR y las piezas impresas del stand: acrílico (doble cara, carta), flyer (carta) y los QR sueltos.
-// Uso: node scripts/stand/impresos.mjs   → marca/09-stand/{qr,acrilicos,flyer}
+// Uso: node scripts/stand/impresos.mjs   → marca/stand/ (qr-*, flyer-carta.*)
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import puppeteer from 'puppeteer-core'
 import QRCode from 'qrcode'
 import sharp from 'sharp'
+import { tmpdir } from 'node:os'
+const TMP = join(tmpdir(), 'nl-fuente')
+mkdirSync(TMP, { recursive: true })
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..')
-const OUT = join(ROOT, 'marca/09-stand')
+const OUT = join(ROOT, 'marca/stand')
 const CHROME = process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-const WEB = 'https://miguelet3s-star.github.io/next-legal/'
+const WEB = 'https://nextlegalhn.github.io/'
 const IG = 'https://www.instagram.com/nextlegalhn/'
 const FORM = 'https://forms.gle/wK3WDjRJYFCfWh4z8'
 const url = (p) => pathToFileURL(join(ROOT, p)).href
@@ -23,16 +26,16 @@ function qrSvg(texto, color = TINTA) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 ${size + 4} ${size + 4}" fill="${color}" shape-rendering="crispEdges">${r}</svg>`
 }
 const QRS = { web: qrSvg(WEB), instagram: qrSvg(IG), encuesta: qrSvg(FORM) }
-mkdirSync(join(OUT, 'qr'), { recursive: true })
+mkdirSync(OUT, { recursive: true })
 for (const [n, svg] of Object.entries(QRS)) {
-  writeFileSync(join(OUT, 'qr', `qr-${n}.svg`), svg)
-  await sharp(Buffer.from(svg), { density: 300 }).resize(1500, 1500).flatten({ background: '#fff' }).png().toFile(join(OUT, 'qr', `qr-${n}.png`))
+  writeFileSync(join(OUT, `qr-${n}.svg`), svg)
+  await sharp(Buffer.from(svg), { density: 300 }).resize(1500, 1500).flatten({ background: '#fff' }).png().toFile(join(OUT, `qr-${n}.png`))
 }
 
 const CSS = `
-@font-face{font-family:Manrope;font-weight:400;src:url(${url('marca/04-tipografia/manrope-latin-400-normal.woff')})}
-@font-face{font-family:Manrope;font-weight:700;src:url(${url('marca/04-tipografia/manrope-latin-700-normal.woff')})}
-@font-face{font-family:Manrope;font-weight:800;src:url(${url('marca/04-tipografia/manrope-latin-800-normal.woff')})}
+@font-face{font-family:Manrope;font-weight:400;src:url(${url('marca/identidad/manrope-latin-400-normal.woff')})}
+@font-face{font-family:Manrope;font-weight:700;src:url(${url('marca/identidad/manrope-latin-700-normal.woff')})}
+@font-face{font-family:Manrope;font-weight:800;src:url(${url('marca/identidad/manrope-latin-800-normal.woff')})}
 @page{size:8.5in 11in;margin:0}
 *{box-sizing:border-box;margin:0}
 html,body{width:8.5in;height:11in;font-family:Manrope,sans-serif;color:${TINTA};background:#fff}
@@ -59,8 +62,8 @@ h1{margin-top:3mm;text-align:center;font-weight:800;font-size:36pt;line-height:1
 .card b{display:block;margin-top:3mm;font-size:13pt;font-weight:800}
 .card span{display:block;margin-top:1mm;font-size:9.5pt;color:#4b5877}
 `
-const LOGO = url('marca/01-logo/nextlegal-logo-blanco.png')
-const LOGO_C = url('marca/01-logo/nextlegal-logo-color.png')
+const LOGO = url('marca/identidad/nextlegal-logo-blanco.png')
+const LOGO_C = url('marca/identidad/nextlegal-logo-color.png')
 const cabecera = `<div class="cab"><img src="${LOGO}"></div>`
 
 const ACRILICO_A = `<div class="pag">${cabecera}
@@ -89,15 +92,11 @@ const FLYER = `<div class="pag">${cabecera}
 
 const html = (cuerpo) => `<!doctype html><html lang="es"><meta charset="utf-8"><style>${CSS}</style><body>${cuerpo}</body></html>`
 const piezas = [
-  ['acrilicos/acrilico-carta-doble-cara', ACRILICO_A + ACRILICO_B, 2],
-  ['acrilicos/acrilico-cara-A-web', ACRILICO_A, 1],
-  ['acrilicos/acrilico-cara-B-instagram', ACRILICO_B, 1],
-  ['flyer/flyer-carta', FLYER, 1],
+  ['flyer-carta', FLYER, 1],
 ]
 const nav = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--allow-file-access-from-files'] })
 for (const [nombre, cuerpo, paginas] of piezas) {
-  mkdirSync(dirname(join(OUT, nombre)), { recursive: true })
-  const f = join(OUT, nombre + '.html')
+  const f = join(TMP, nombre + '.html')
   writeFileSync(f, html(cuerpo))
   const p = await nav.newPage()
   await p.setViewport({ width: 816, height: 1056, deviceScaleFactor: 3.125 })
@@ -106,7 +105,6 @@ for (const [nombre, cuerpo, paginas] of piezas) {
   await p.pdf({ path: join(OUT, nombre + '.pdf'), width: '8.5in', height: '11in', printBackground: true, preferCSSPageSize: true })
   if (paginas === 1) await p.screenshot({ path: join(OUT, nombre + '.png'), clip: { x: 0, y: 0, width: 816, height: 1056 } })
   await p.close()
-  await sharp(join(OUT, nombre + '.html')).metadata().catch(() => {})
 }
 await nav.close()
 console.log('listo')

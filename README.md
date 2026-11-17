@@ -4,9 +4,9 @@
 
 Prototipo navegable de la página de lanzamiento y de la app de Next Legal.
 
-- **Sitio publicado:** https://miguelet3s-star.github.io/next-legal/
-- **Inicio de sesión:** https://miguelet3s-star.github.io/next-legal/entrar
-- **Vista previa del correo de bienvenida:** https://miguelet3s-star.github.io/next-legal/correo
+- **Sitio publicado:** https://nextlegalhn.github.io/
+- **Inicio de sesión:** https://nextlegalhn.github.io/entrar
+- **Vista previa del correo de bienvenida:** https://nextlegalhn.github.io/correo
 - **Versión “ya lanzada”** (el botón pasa a *Iniciar sesión*): agregue `?lanzado=1` a la dirección.
 
 ## Las dos áreas de la app
@@ -27,14 +27,14 @@ npm run build      # compilación de producción
 
 ## Publicar en GitHub Pages
 ```bash
-npm run deploy     # compila con base /next-legal/ y publica en la rama gh-pages
+npm run deploy     # compila con base / y publica en la organización NextLegalHN en la rama gh-pages
 ```
 
 ## Datos provisionales
 - Fecha de lanzamiento y lista de espera: `src/lib/launch.ts` (`LAUNCH_DATE`, `WAITLIST_BASE`).
 - Tras cambiar la fecha, regenerar la cuenta regresiva del correo: `npm run email:gif`.
-- Videos del logo en bucle para pantallas, en horizontal (1920×1080) y vertical (1080×1920): `npm run marca:videos` los deja en `marca/08-videos/`.
-- Videos del stand (la app real manejándose sola, con «Muy pronto» y QR): `npm run stand:videos` graba los seis en `marca/08-videos/stand/` (tarda unos 10 minutos y necesita Google Chrome). La dirección del QR está en `scripts/stand/escena.js` (`WEB`); si cambia, hay que volver a grabar.
+- Videos del logo en bucle para pantallas, en horizontal (1920×1080) y vertical (1080×1920): `npm run marca:videos` los deja en `marca/stand/`.
+- Videos del stand (la app real manejándose sola, con «Muy pronto» y QR): `npm run stand:videos` graba los seis en `marca/stand/` (tarda unos 10 minutos y necesita Google Chrome). La dirección del QR está en `scripts/stand/escena.js` (`WEB`); si cambia, hay que volver a grabar.
 - Los registros del kiosko se guardan solo en el dispositivo; se exportan desde `/kiosko/registros`.
 
 ## Stack

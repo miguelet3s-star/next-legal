@@ -1,9 +1,9 @@
 // Genera los videos en bucle del logo para pantallas (30 cuadros/s), en horizontal (1920×1080)
 // y vertical (1080×1920).
 // Uso: node scripts/logo-loops.mjs [horizontal|vertical] [tinta|claro|presentacion|presentacion-claro] [--cuadro <segundo>]
-//   sin argumentos → genera todos en marca/08-videos/<formato>/
+//   sin argumentos → genera todos en marca/stand/
 //   --cuadro 3     → guarda solo ese instante como PNG (para revisar sin esperar el video)
-// El logo se toma tal cual de marca/01-logo (no se redibuja) y el lema de logo-loops-lema.json
+// El logo se toma tal cual de marca/identidad (no se redibuja) y el lema de logo-loops-lema.json
 // (Manrope 700 en trazos, palabra por palabra). Cada bucle termina exactamente donde empieza.
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync } from 'node:fs'
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const OUT = join(ROOT, 'marca/08-videos')
+const OUT = join(ROOT, 'marca/stand')
 const FPS = 30
 const ARC = 'M54 62 C 90 44, 140 36, 204 55 C 196 58, 186 62, 178 61 C 150 52, 100 50, 54 62 Z'
 
@@ -40,7 +40,7 @@ const FORMATOS = {
 
 /** Lee del SVG oficial los trazos de "Next" y "Legal" con su transformación. */
 function wordmark(file) {
-  const svg = readFileSync(join(ROOT, 'marca/01-logo', file), 'utf8')
+  const svg = readFileSync(join(ROOT, 'marca/identidad', file), 'utf8')
   const paths = [...svg.matchAll(/<path transform="([^"]+)" d="([^"]+)"/g)].map((m) => ({ transform: m[1], d: m[2] }))
   if (paths.length !== 2) throw new Error(`No se pudo leer el logo de ${file}`)
   return { next: paths[0], legal: paths[1] }
@@ -165,18 +165,18 @@ function presentacion(t) {
 }
 
 const VIDEOS = {
-  tinta: { archivo: 'next-legal-logo-bucle-tinta.mp4', T: 10, tema: TEMAS.oscuro, estado: (t) => vivo(t, 10), lema: false },
-  claro: { archivo: 'next-legal-logo-bucle-claro.mp4', T: 10, tema: TEMAS.claro, estado: (t) => vivo(t, 10), lema: false },
-  presentacion: { archivo: 'next-legal-logo-bucle-presentacion.mp4', T: 12, tema: TEMAS.oscuro, estado: presentacion, lema: true },
-  'presentacion-claro': { archivo: 'next-legal-logo-bucle-presentacion-claro.mp4', T: 12, tema: TEMAS.claro, estado: presentacion, lema: true },
+  tinta: { archivo: 'video-logo-bucle-tinta.mp4', T: 10, tema: TEMAS.oscuro, estado: (t) => vivo(t, 10), lema: false },
+  claro: { archivo: 'video-logo-bucle-claro.mp4', T: 10, tema: TEMAS.claro, estado: (t) => vivo(t, 10), lema: false },
+  presentacion: { archivo: 'video-logo-bucle-presentacion.mp4', T: 12, tema: TEMAS.oscuro, estado: presentacion, lema: true },
+  'presentacion-claro': { archivo: 'video-logo-bucle-presentacion-claro.mp4', T: 12, tema: TEMAS.claro, estado: presentacion, lema: true },
 }
 
 const svgEn = (F, v, t) => cuadro(F, v.tema, t / v.T, v.estado(t), v.lema)
 
 async function generar(formato, nombre) {
   const F = FORMATOS[formato], v = VIDEOS[nombre]
-  mkdirSync(join(OUT, formato), { recursive: true })
-  const salida = join(OUT, formato, v.archivo)
+  mkdirSync(OUT, { recursive: true })
+  const salida = join(OUT, v.archivo)
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', `${F.W}x${F.H}`, '-r', String(FPS), '-i', '-',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '15', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.2',
     '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-movflags', '+faststart', salida], { stdio: ['pipe', 'inherit', 'inherit'] })

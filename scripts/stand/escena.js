@@ -3,10 +3,10 @@
 // en medio, la app real se maneja sola dentro de un teléfono o una ventana.
 import '@fontsource-variable/manrope'
 import QRCode from 'qrcode'
-import logoSvg from '../../marca/01-logo/nextlegal-logo-blanco.svg?raw'
+import logoSvg from '../../marca/identidad/nextlegal-logo-blanco.svg?raw'
 
 /** A dónde lleva el QR. No se muestra escrita en ningún video. */
-const WEB = 'https://miguelet3s-star.github.io/next-legal/'
+const WEB = 'https://nextlegalhn.github.io/'
 const SESION = 'nextlegal.session.v1'
 
 const $ = (s) => document.querySelector(s)
